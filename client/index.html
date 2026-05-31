@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      ;(() => {
+        const storageKey = 'intellex-theme'
+
+        try {
+          const storedTheme = localStorage.getItem(storageKey)
+          const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const theme =
+            storedTheme === 'dark' || storedTheme === 'light'
+              ? storedTheme
+              : preferredDark
+                ? 'dark'
+                : 'light'
+
+          document.documentElement.classList.toggle('dark', theme === 'dark')
+          document.documentElement.style.colorScheme = theme
+        } catch {
+          // Ignore storage access failures and let the provider resolve it later.
+        }
+      })()
+    </script>
+    <title>client</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

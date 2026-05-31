@@ -1,0 +1,17 @@
+:root {
+	--app-background: 248 250 252;
+	--app-foreground: 15 23 42;
+	--app-surface: 255 255 255;
+	--app-border: 226 232 240;
+	--app-muted: 100 116 139;
+	--app-accent: 14 165 233;
+}
+
+.dark {
+	--app-background: 2 6 23;
+	--app-foreground: 248 250 252;
+	--app-surface: 15 23 42;
+	--app-border: 51 65 85;
+	--app-muted: 148 163 184;
+	--app-accent: 125 211 252;
+}
