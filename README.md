@@ -1,171 +1,385 @@
 # Intellex Chatbot
 
-Intellex Chatbot is a full-stack chatbot project with a React + Vite client and a Node/Express backend that now covers authentication, chat persistence, PDF upload ingestion, and Chroma-backed RAG retrieval.
+Intellex Chatbot is a full-stack chatbot app with a React + Vite frontend and a FastAPI backend. It supports JWT authentication, chat persistence, PDF upload ingestion, and Chroma-backed retrieval-augmented generation.
 
-## Repository Structure
+## Deployment
 
-```text
-Intellex-chatbot/
-├── client/
-│   ├── eslint.config.js
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── src/
-│       ├── App.jsx
-│       ├── main.jsx
-│       ├── app/
-│       │   ├── providers/
-│       │   │   ├── AuthProvider.jsx
-│       │   │   └── ThemeProvider.jsx
-│       │   ├── routes/
-│       │   │   └── AppRoutes.jsx
-│       │   └── store/
-│       │       └── chatStore.js
-│       ├── components/
-│       │   ├── layout/
-│       │   │   ├── MainLayout.jsx
-│       │   │   ├── Navbar.jsx
-│       │   │   └── Sidebar.jsx
-│       │   └── ui/
-│       │       ├── Button.jsx
-│       │       ├── Input.jsx
-│       │       ├── Loader.jsx
-│       │       └── Modal.jsx
-│       ├── context/
-│       │   ├── AuthContext.jsx
-│       │   └── ThemeContext.jsx
-│       ├── features/
-│       │   ├── auth/
-│       │   │   ├── components/
-│       │   │   ├── hooks/
-│       │   │   ├── pages/
-│       │   │   └── services/
-│       │   ├── chat/
-│       │   │   ├── components/
-│       │   │   │   ├── ChatBox.jsx
-│       │   │   │   ├── MessageBox.jsx
-│       │   │   │   └── UploadBox.jsx
-│       │   │   ├── hooks/
-│       │   │   │   └── useChat.js
-│       │   │   ├── pages/
-│       │   │   │   └── ChatPage.jsx
-│       │   │   └── services/
-│       │   │       └── chatApi.js
-│       │   └── upload/
-│       │       ├── components/
-│       │       ├── hooks/
-│       │       └── services/
-│       ├── hooks/
-│       │   ├── useDebounce.js
-│       │   └── useTheme.js
-│       ├── pages/
-│       │   ├── Home.jsx
-│       │   ├── Login.jsx
-│       │   └── Signup.jsx
-│       ├── services/
-│       │   ├── apiEndpoints.js
-│       │   └── axios.js
-│       ├── styles/
-│       │   ├── globals.css
-│       │   ├── themes.css
-│       │   └── variables.css
-│       └── utils/
-│           ├── constants.js
-│           └── formatDate.js
-└── server/
-    ├── package.json
-    └── src/
-        ├── app.js
-        ├── server.js
-        ├── config/
-        │   ├── db.js
-        │   └── env.js
-        ├── controllers/
-        │   ├── authController.js
-        │   ├── chatController.js
-        │   └── uploadController.js
-        ├── middleware/
-        │   ├── authMiddleware.js
-        │   ├── errorMiddleware.js
-        │   └── uploadMiddleware.js
-        ├── models/
-        │   ├── Chat.js
-        │   ├── Message.js
-        │   └── User.js
-        ├── routes/
-        │   ├── authRoutes.js
-        │   ├── chatRoutes.js
-        │   └── uploadRoutes.js
-        ├── services/
-        │   ├── ai/
-        │   │   ├── embeddingService.js
-        │   │   ├── llmService.js
-        │   │   └── ragService.js
-        │   ├── auth/
-        │   │   └── authService.js
-        │   └── db/
-        │       └── vectorStoreService.js
-        ├── uploads/
-        └── utils/
-            ├── generateToken.js
-            └── logger.js
+- Frontend: https://intellex-sand.vercel.app/
+- Backend: https://squid-app-hgnfm.ondigitalocean.app/
+
+## Tech Stack
+
+### Frontend
+
+- React 19 - component-based UI for the chat app and auth flows.
+- Vite - fast local development and production bundling.
+- React Router - page routing for login, signup, home, and protected views.
+- Axios - API client with JWT bearer header injection.
+- Tailwind CSS - utility-first styling for fast layout and theme work.
+
+### Backend
+
+- FastAPI - async API framework with strong request validation and OpenAPI support.
+- Pydantic - schema validation and response shaping.
+- Uvicorn - ASGI server used to run the API.
+- Motor / MongoDB - async database access for users, chats, messages, and uploads.
+- python-jose - JWT creation and verification.
+- bcrypt - password hashing.
+- pypdf - PDF text extraction before ingestion.
+- ChromaDB - vector store for retrieval on uploaded documents.
+
+### Tooling
+
+- ESLint - frontend linting.
+- python-dotenv - environment variable loading.
+- Vercel - frontend hosting.
+- DigitalOcean App Platform - backend hosting.
+
+## How to Run Locally
+
+The frontend can be run with Node.js only. The backend is Python-based, so a full local backend run also requires Python 3.11+ and pip.
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm run dev
 ```
 
-## What Has Been Implemented
+The app will be available at http://localhost:5173.
 
-### Client
+### Backend
 
-- Tailwind CSS v4 is wired into Vite through `@tailwindcss/vite`.
-- Dark and light mode support is implemented with a theme provider.
-- Theme selection is stored in `localStorage` under `intellex-theme`.
-- Theme preference is restored on page load and applied before React mounts to avoid a flash of the wrong theme.
-- `useTheme()` is exposed through the context layer for consuming components.
-- The starter app has been replaced with a small Tailwind-based theme demo screen.
-- Global theme variables and base styles are defined in the `styles/` folder.
+```bash
+cd server-python
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-### Server
+If your shell does not have `python3`, install Python 3.11+ first. The API will be available at http://localhost:8000.
 
-- Authentication is implemented with JWT cookies, protected routes, and user profile handling.
-- Chat persistence is implemented with MongoDB chat and message models, controller endpoints, and message history helpers.
-- PDF uploads are parsed on the server and the extracted text is chunked, embedded, and stored in a local Chroma persistent database.
-- The RAG retrieval path is implemented so chat responses can optionally use Chroma document context through the existing `useRAG` flow.
-- The server structure still includes room for additional auth, chat, upload, and retrieval enhancements, but the main backend flows are now live.
+## API Documentation
 
-## Key Client Files
+All protected endpoints expect `Authorization: Bearer <token>`.
 
-- [client/vite.config.js](client/vite.config.js)
-- [client/src/index.css](client/src/index.css)
-- [client/src/main.jsx](client/src/main.jsx)
-- [client/src/context/ThemeContext.jsx](client/src/context/ThemeContext.jsx)
-- [client/src/app/providers/ThemeProvider.jsx](client/src/app/providers/ThemeProvider.jsx)
-- [client/src/App.jsx](client/src/App.jsx)
-- [client/index.html](client/index.html)
+### Auth
 
-## Notes
+#### `POST /api/auth/signup`
 
-- The current client build passes successfully.
-- Chroma now uses a local persistent path configured with `CHROMA_PATH` (default: `server-python/chroma-data`). No separate Chroma server is required for local development.
-- The backend expects `CHROMA_PATH` and `CHROMA_COLLECTION_NAME` when needed.
+Request body:
 
-## Recent Progress (Chat feature)
+```json
+{
+	"name": "Ada Lovelace",
+	"email": "ada@example.com",
+	"password": "secret123"
+}
+```
 
-Below is a concise changelog of the chat-related work completed in this workspace during the current session:
+Response shape:
 
-- **Chat components added:** `ChatBox`, `MessageBox`, and `UploadBox` created under `client/src/features/chat/components/`. These provide the chat UI, message rendering (including code blocks and loading state), and a file upload UI.
-- **Client hook implemented:** `useChat` added at `client/src/features/chat/hooks/useChat.js` to manage chat state, loading, error handling, and interactions with the API.
-- **Chat service implemented:** `client/src/features/chat/services/chatApi.js` added with `sendChatMessage`, `uploadChatFiles`, `getChatHistory`, and `clearChatHistory` helper functions that use the existing axios instance.
-- **API endpoints centralized:** `client/src/services/apiEndpoints.js` added and populated with `CHAT` endpoints (send, upload, get, delete, list) and other base endpoints.
-- **Chat page scaffolded:** `client/src/features/chat/pages/ChatPage.jsx` added and wired to render the `ChatBox` inside the main layout.
-- **Authentication backend completed:** user registration, login, logout, protected profile access, and auth middleware are implemented and wired into the server.
-- **Chat persistence backend completed:** chat and message storage, retrieval, title updates, message clearing, and protected chat routes are implemented.
-- **PDF upload ingestion added:** uploaded PDFs are parsed server-side, chunked, embedded, and stored in a local Chroma persistent database for later retrieval.
-- **RAG retrieval added:** the chat response flow can now retrieve relevant Chroma chunks and feed them into the LLM when `useRAG` is enabled.
+```json
+{
+	"success": true,
+	"message": "User registered successfully",
+	"access_token": "jwt-token",
+	"token_type": "bearer",
+	"user": {
+		"_id": "user-id",
+		"name": "Ada Lovelace",
+		"email": "ada@example.com",
+		"created_at": "2026-06-02T00:00:00Z",
+		"updated_at": "2026-06-02T00:00:00Z"
+	}
+}
+```
 
-These changes are intended as a full-stack integration layer; the main frontend and backend flows are now connected, with Chroma as the document store for RAG-enabled uploads and retrieval.
+#### `POST /api/auth/login`
 
-If you'd like, I can:
+Request body:
 
-- Wire `ChatPage` into the app routes (`client/src/app/routes/AppRoutes.jsx`).
-- Add tests or storybook stories for the new components.
-- Add a README section for local setup, environment variables, and how to run the server with Chroma.
+```json
+{
+	"email": "ada@example.com",
+	"password": "secret123"
+}
+```
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "Logged in successfully",
+	"access_token": "jwt-token",
+	"token_type": "bearer",
+	"user": {
+		"_id": "user-id",
+		"name": "Ada Lovelace",
+		"email": "ada@example.com",
+		"created_at": "2026-06-02T00:00:00Z",
+		"updated_at": "2026-06-02T00:00:00Z"
+	}
+}
+```
+
+#### `POST /api/auth/logout`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "Logged out successfully"
+}
+```
+
+#### `GET /api/auth/profile`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"user": {
+		"_id": "user-id",
+		"name": "Ada Lovelace",
+		"email": "ada@example.com",
+		"created_at": "2026-06-02T00:00:00Z",
+		"updated_at": "2026-06-02T00:00:00Z"
+	}
+}
+```
+
+### Chat
+
+#### `POST /api/chat`
+
+Request body:
+
+```json
+{
+	"title": "New Chat",
+	"description": "Optional description"
+}
+```
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "Chat created successfully",
+	"chat": {
+		"_id": "chat-id",
+		"title": "New Chat",
+		"description": "Optional description",
+		"userId": "user-id",
+		"createdAt": "2026-06-02T00:00:00Z",
+		"updatedAt": "2026-06-02T00:00:00Z"
+	}
+}
+```
+
+#### `GET /api/chat?page=1&limit=50`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"chats": [],
+	"page": 1,
+	"limit": 50
+}
+```
+
+#### `POST /api/chat/message`
+
+Request body:
+
+```json
+{
+	"chatId": "chat-id",
+	"message": "What is in this document?",
+	"useRAG": true
+}
+```
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "Message sent successfully",
+	"userMessage": {},
+	"assistantMessage": {}
+}
+```
+
+#### `GET /api/chat/:chat_id`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"chat": {}
+}
+```
+
+#### `GET /api/chat/:chat_id/messages?page=1&limit=100`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"messages": [],
+	"page": 1,
+	"limit": 100
+}
+```
+
+#### `GET /api/chat/:chat_id/files`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"files": []
+}
+```
+
+#### `PUT /api/chat/:chat_id/title`
+
+Request body:
+
+```json
+{
+	"title": "Renamed chat"
+}
+```
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "Chat title updated",
+	"chat": {}
+}
+```
+
+#### `DELETE /api/chat/:chat_id`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "..."
+}
+```
+
+#### `DELETE /api/chat/:chat_id/messages`
+
+Request body: none
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"message": "..."
+}
+```
+
+### Upload
+
+#### `POST /api/upload`
+
+Request body: `multipart/form-data`
+
+- `file`: PDF file
+- `chat_id` or `chatId`: optional chat id
+
+Response shape:
+
+```json
+{
+	"success": true,
+	"file": {},
+	"parsed": {
+		"pages": [],
+		"text": ""
+	},
+	"ingestion": {
+		"success": true,
+		"chunk_count": 0,
+		"metadata": {}
+	},
+	"storedFile": {}
+}
+```
+
+## Project Structure
+
+```text
+.
+├── client/                  Frontend application
+│   └── src/
+│       ├── app/             Providers and route guards
+│       ├── components/      Shared UI and layout components
+│       ├── context/         React contexts
+│       ├── features/        Feature-specific pages, hooks, and services
+│       ├── pages/           Top-level pages like Home, Login, Signup
+│       ├── services/        Axios client and API endpoint helpers
+│       ├── styles/          Global styles, themes, and variables
+│       └── utils/           Small shared helpers
+├── server-python/           FastAPI backend
+│   └── app/
+│       ├── api/             Route definitions and dependencies
+│       ├── controllers/     Request handlers
+│       ├── core/            Config, database, security, logging
+│       ├── middleware/      Auth, upload, and error middleware
+│       ├── models/          Database models
+│       ├── schemas/         Pydantic request/response schemas
+│       ├── services/        Auth, chat, file, PDF, and RAG logic
+│       └── utils/           Shared helpers
+├── README.md                Project overview and setup notes
+└── chroma-data/             Local Chroma persistence used for retrieval
+```
+
+## Next Steps
+
+What I did not do yet:
+
+- I did not add Docker or a one-command full-stack launcher.
+- I did not add automated API smoke tests or frontend end-to-end tests.
+- I did not add a production-ready token refresh flow.
+
+What I would build next:
+
+- A refresh-token flow so the JWT does not need to live in localStorage long term.
+- Docker Compose for MongoDB, backend, and frontend to make local setup repeatable.
+- A small API test suite for auth, chat creation, message sending, and uploads.
+- Better upload feedback and chat streaming in the UI.
