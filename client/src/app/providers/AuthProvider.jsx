@@ -3,18 +3,34 @@ import { AuthContext } from '../../context/AuthContext.jsx'
 import api from '../../services/axios'
 import { API_ENDPOINTS } from '../../services/apiEndpoints'
 
+const AUTH_TOKEN_KEY = 'auth_token'
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const hasActiveSessionCookie = () =>
-    typeof document !== 'undefined' && document.cookie.includes('logged_in=true')
+  const getStoredToken = () =>
+    typeof window !== 'undefined' ? window.localStorage.getItem(AUTH_TOKEN_KEY) : null
+
+  const storeToken = (token) => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(AUTH_TOKEN_KEY, token)
+    }
+  }
+
+  const clearToken = () => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(AUTH_TOKEN_KEY)
+    }
+  }
 
   // Check if user is already logged in on mount
   useEffect(() => {
     const checkAuth = async () => {
-      if (!hasActiveSessionCookie()) {
+      const token = getStoredToken()
+
+      if (!token) {
         setUser(null)
         setIsLoading(false)
         return
@@ -26,6 +42,7 @@ export function AuthProvider({ children }) {
         setError(null)
       } catch (err) {
         setUser(null)
+        clearToken()
         // User is not authenticated, which is expected
       } finally {
         setIsLoading(false)
@@ -44,6 +61,10 @@ export function AuthProvider({ children }) {
         email,
         password,
       })
+      const token = response.data.access_token
+      if (token) {
+        storeToken(token)
+      }
       setUser(response.data.user)
       return response.data
     } catch (err) {
@@ -63,6 +84,10 @@ export function AuthProvider({ children }) {
         email,
         password,
       })
+      const token = response.data.access_token
+      if (token) {
+        storeToken(token)
+      }
       setUser(response.data.user)
       return response.data
     } catch (err) {
@@ -78,6 +103,7 @@ export function AuthProvider({ children }) {
     setIsLoading(true)
     try {
       await api.post(API_ENDPOINTS.AUTH.LOGOUT)
+      clearToken()
       setUser(null)
       setError(null)
     } catch (err) {

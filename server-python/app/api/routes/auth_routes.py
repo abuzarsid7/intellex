@@ -1,7 +1,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 
 from app.controllers.auth_controller import get_profile, login, logout, register
 from app.middleware.auth_middleware import get_current_user
@@ -12,18 +12,18 @@ router = APIRouter()
 
 
 @router.post("/signup")
-async def signup(payload: RegisterRequest, response: Response):
-	return await register(payload, response)
+async def signup(payload: RegisterRequest):
+	return await register(payload)
 
 
 @router.post("/login")
-async def signin(payload: LoginRequest, response: Response):
-	return await login(payload, response)
+async def signin(payload: LoginRequest):
+	return await login(payload)
 
 
 @router.post("/logout")
-async def signout(response: Response):
-	return await logout(response)
+async def signout():
+	return await logout()
 
 
 @router.get("/profile")
